@@ -2,21 +2,32 @@ using UnityEngine;
 
 public class NewMonoBehaviourScript : MonoBehaviour
 {
-    public WheelCollider frontRightWheelCollider;
-    public WheelCollider frontLeftWheelCollider;
-    public WheelCollider backRightWheelCollider;
-    public WheelCollider backLeftWheelCollider;
+    [SerializeField] private WheelCollider frontRightWheelCollider;
+    [SerializeField] private WheelCollider frontLeftWheelCollider;
+    [SerializeField] private WheelCollider backRightWheelCollider;
+    [SerializeField] private WheelCollider backLeftWheelCollider;
 
-    public Transform frontRightWheel;
-    public Transform frontLeftWheel;
-    public Transform backRightWheel;
-    public Transform backLeftWheel;
+    [SerializeField] private Transform frontRightWheelTransform;
+    [SerializeField] private Transform frontLeftWheelTransform;
+    [SerializeField] private Transform backRightWheelTransform;
+    [SerializeField] private Transform backLeftWheelTransform;
 
-    public float motorForce = 100f;
-    public float steeringValue = 30;
+    [SerializeField] private Transform carCenterOfMassTransform; 
+    [SerializeField] private Rigidbody rigidBody;  
+
+    [SerializeField] private float motorForce = 100f;
+    [SerializeField] private float steeringValue = 30f;
+    [SerializeField] private float brakeForce = 1000f;
+
     float verticalInput;
     float horizontalInput;
     float steeringAngle;
+
+    void Start()
+    {
+        rigidBody = GetComponent<Rigidbody>(); 
+        rigidBody.centerOfMass = carCenterOfMassTransform.localPosition; 
+    }
 
     void FixedUpdate()
     {
@@ -24,6 +35,7 @@ public class NewMonoBehaviourScript : MonoBehaviour
         Move();
         Steer();
         UpdateWheels();
+        Brake(); 
     }
 
     void GetInput()
@@ -31,6 +43,24 @@ public class NewMonoBehaviourScript : MonoBehaviour
         verticalInput = Input.GetAxis("Vertical");
         horizontalInput = Input.GetAxis("Horizontal");
     }
+    
+    void Brake()
+    {
+    if (Input.GetKey(KeyCode.Space))
+    {
+        frontLeftWheelCollider.brakeTorque = brakeForce;
+        frontRightWheelCollider.brakeTorque = brakeForce;
+        backLeftWheelCollider.brakeTorque = brakeForce;
+        backRightWheelCollider.brakeTorque = brakeForce;
+    }
+    else
+    {
+        frontLeftWheelCollider.brakeTorque = 0f;
+        frontRightWheelCollider.brakeTorque = 0f;
+        backLeftWheelCollider.brakeTorque = 0f;
+        backRightWheelCollider.brakeTorque = 0f;
+    }
+  }
 
     void Move()
     {
@@ -47,10 +77,10 @@ public class NewMonoBehaviourScript : MonoBehaviour
 
     void UpdateWheels()
     {
-        UpdateSingleWheel(frontRightWheelCollider, frontRightWheel);
-        UpdateSingleWheel(frontLeftWheelCollider, frontLeftWheel);
-        UpdateSingleWheel(backLeftWheelCollider, backLeftWheel);
-        UpdateSingleWheel(backRightWheelCollider, backRightWheel);
+        UpdateSingleWheel(frontRightWheelCollider, frontRightWheelTransform);
+        UpdateSingleWheel(frontLeftWheelCollider, frontLeftWheelTransform);
+        UpdateSingleWheel(backLeftWheelCollider, backLeftWheelTransform);
+        UpdateSingleWheel(backRightWheelCollider, backRightWheelTransform);
     }
 
     void UpdateSingleWheel(WheelCollider collider, Transform wheelTransform)

@@ -2,27 +2,47 @@ using UnityEngine;
 
 public class FollowCar : MonoBehaviour
 {
-
-    public Transform carTransform; 
-    public Transform followCarCamera; 
+    private Transform carTransform; 
+    private Transform followCarCamera; 
 
     private Vector3 velocity = Vector3.zero;
 
     void Start()
     {
-        
+        // Find the player car by tag
+        GameObject playerCar = GameObject.FindWithTag("Player");
+        if (playerCar != null)
+        {
+            carTransform = playerCar.transform;
+            // Find the CameraPoint child inside the car
+            followCarCamera = playerCar.transform.Find("followCarCamera");
+
+            if (followCarCamera == null)
+            {
+                Debug.LogError("CameraPoint not found under Player car!");
+            }
+        }
+        else
+        {
+            Debug.LogError("No GameObject with tag 'Player' found!");
+        }
     }
 
-    // Update is called once per frame
     void FixedUpdate()
     {
-        transform.LookAt(carTransform); 
+        if (carTransform == null || followCarCamera == null)
+            return;
+
+        // Make the camera look at the car
+        transform.LookAt(carTransform);
+
+        // Smoothly move the camera to the follow point
         transform.position = Vector3.SmoothDamp(
-        transform.position,             // current position of the camera
-        followCarCamera.position,       // target position you want to reach
-        ref velocity,                  // a reference to the current velocity, updated by SmoothDamp
-        5f * Time.deltaTime           // smooth time (how fast to reach the target)
+            transform.position,
+            followCarCamera.position,
+            ref velocity,
+            0.3f  // Smoother and more realistic response time
         );
- 
     }
 }
+
