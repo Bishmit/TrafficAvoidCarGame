@@ -1,6 +1,7 @@
 using UnityEngine;
+using UnityEngine.InputSystem.Utilities;
 
-public class NewMonoBehaviourScript : MonoBehaviour
+public class CarController : MonoBehaviour
 {
     [SerializeField] private WheelCollider frontRightWheelCollider;
     [SerializeField] private WheelCollider frontLeftWheelCollider;
@@ -18,7 +19,7 @@ public class NewMonoBehaviourScript : MonoBehaviour
     [SerializeField] private float motorForce = 100f;
     [SerializeField] private float steeringValue = 30f;
     [SerializeField] private float brakeForce = 1000f;
-
+    
     float verticalInput;
     float horizontalInput;
     float steeringAngle;
@@ -36,6 +37,8 @@ public class NewMonoBehaviourScript : MonoBehaviour
         Steer();
         UpdateWheels();
         Brake(); 
+        AutoSteeringAdjustToCentre(); 
+        Debug.Log(GetCarSpeed()); 
     }
 
     void GetInput()
@@ -52,6 +55,7 @@ public class NewMonoBehaviourScript : MonoBehaviour
         frontRightWheelCollider.brakeTorque = brakeForce;
         backLeftWheelCollider.brakeTorque = brakeForce;
         backRightWheelCollider.brakeTorque = brakeForce;
+        rigidBody.linearDamping = 2f; 
     }
     else
     {
@@ -59,6 +63,7 @@ public class NewMonoBehaviourScript : MonoBehaviour
         frontRightWheelCollider.brakeTorque = 0f;
         backLeftWheelCollider.brakeTorque = 0f;
         backRightWheelCollider.brakeTorque = 0f;
+        rigidBody.linearDamping = 0f; 
     }
   }
 
@@ -73,6 +78,19 @@ public class NewMonoBehaviourScript : MonoBehaviour
         steeringAngle = steeringValue * horizontalInput;
         frontLeftWheelCollider.steerAngle = steeringAngle;
         frontRightWheelCollider.steerAngle = steeringAngle;
+    }
+
+    void AutoSteeringAdjustToCentre(){
+        Quaternion targetRotation = Quaternion.Euler(0f, 0f, 0f);
+        float rotationSpeed = 2f;
+
+        if (!IsSteering() && Quaternion.Angle(transform.rotation, targetRotation) > 0.1f) {
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation, 
+                targetRotation, 
+                Time.deltaTime * rotationSpeed
+            );
+        } 
     }
 
     void UpdateWheels()
@@ -91,4 +109,13 @@ public class NewMonoBehaviourScript : MonoBehaviour
         wheelTransform.position = pos;
         wheelTransform.rotation = rot;
     }
+
+    bool IsSteering(){
+        return horizontalInput != 0; 
+    }
+
+    public float GetCarSpeed(){
+       return rigidBody.linearVelocity.magnitude; 
+    }
 }
+
