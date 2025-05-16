@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TrafficManager : MonoBehaviour
@@ -10,7 +11,7 @@ public class TrafficManager : MonoBehaviour
     [SerializeField] private float maxSpawnsPerSecond = 5f;
 
     private float spawnTimer = 0f;
-
+    public List<GameObject> spawnedVehicles = new(); 
     void Update()
     {
         float carSpeed = carController.GetCarSpeed();
@@ -36,7 +37,8 @@ public class TrafficManager : MonoBehaviour
         int laneIndex = Random.Range(0, lanes.Length);
         int vehicleIndex = Random.Range(0, trafficVehicles.Length);
 
-        Instantiate(trafficVehicles[vehicleIndex], lanes[laneIndex].position, Quaternion.identity);
+        GameObject newCar =  Instantiate(trafficVehicles[vehicleIndex], lanes[laneIndex].position, Quaternion.identity);
+        spawnedVehicles.Add(newCar); 
     }
 }
 

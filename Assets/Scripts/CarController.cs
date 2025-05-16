@@ -38,7 +38,7 @@ public class CarController : MonoBehaviour
         UpdateWheels();
         Brake(); 
         AutoSteeringAdjustToCentre(); 
-        Debug.Log(GetCarSpeed()); 
+      
     }
 
     void GetInput()
