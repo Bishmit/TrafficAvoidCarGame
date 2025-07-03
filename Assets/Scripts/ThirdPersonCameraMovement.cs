@@ -14,7 +14,8 @@ public class ThirdPersonCameraMovement : MonoBehaviour
     void LateUpdate()
     {
        Vector3 cameraPos = transform.position;
-       cameraPos.z = playerCarTransform.position.z + offSet; 
+       cameraPos.z = playerCarTransform.position.z + offSet;
+       cameraPos.x = playerCarTransform.position.x;  
        transform.position = cameraPos;   
     }
 }

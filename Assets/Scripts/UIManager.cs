@@ -35,12 +35,13 @@ public class UIManager : MonoBehaviour
 
     void FindSpeedOfCarInUI(){  
       speed = carController.GetCarSpeed(); 
-      speedText.text = speed.ToString("0" + "km/h");  
+      speedText.text = speed.ToString("0" + "Km/h");  
     }
     void FindDistanceOfCarInUI(){
-        float currentZ = playerCar.position.z; 
-        float distanceMoved = Math.Abs(currentZ - previousZ); 
-        distanceText.text = distanceMoved.ToString("0"); 
+        float currentZ = playerCar.position.z;
+        float distanceMoved = Mathf.Abs(currentZ - previousZ);
+        float distanceKm = distanceMoved / 1000f;
+        distanceText.text = distanceKm.ToString("0.00") + "Km";
     }
 
     int FindScoreOfCar(){
