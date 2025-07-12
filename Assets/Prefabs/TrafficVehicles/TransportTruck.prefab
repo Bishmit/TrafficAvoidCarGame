@@ -295,7 +295,7 @@ GameObject:
   - component: {fileID: 1259616365945467512}
   m_Layer: 0
   m_Name: TransportTruck
-  m_TagString: Untagged
+  m_TagString: TrafficVehicle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

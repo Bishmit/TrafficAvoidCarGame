@@ -13,21 +13,23 @@ public class CarController : MonoBehaviour
     [SerializeField] private Transform backRightWheelTransform;
     [SerializeField] private Transform backLeftWheelTransform;
 
-    [SerializeField] private Transform carCenterOfMassTransform; 
-    [SerializeField] private Rigidbody rigidBody;  
+    [SerializeField] private Transform carCenterOfMassTransform;
+    [SerializeField] private Rigidbody rigidBody;
 
     [SerializeField] private float motorForce = 100f;
     [SerializeField] private float steeringValue = 30f;
     [SerializeField] private float brakeForce = 1000f;
-    
+
+    [SerializeField] UIManager uiManager; 
+
     float verticalInput;
     float horizontalInput;
     float steeringAngle;
 
     void Start()
     {
-        rigidBody = GetComponent<Rigidbody>(); 
-        rigidBody.centerOfMass = carCenterOfMassTransform.localPosition; 
+        rigidBody = GetComponent<Rigidbody>();
+        rigidBody.centerOfMass = carCenterOfMassTransform.localPosition;
     }
 
     void FixedUpdate()
@@ -36,9 +38,9 @@ public class CarController : MonoBehaviour
         Move();
         Steer();
         UpdateWheels();
-        Brake(); 
-        AutoSteeringAdjustToCentre(); 
-      
+        Brake();
+        AutoSteeringAdjustToCentre();
+
     }
 
     void GetInput()
@@ -46,26 +48,26 @@ public class CarController : MonoBehaviour
         verticalInput = Input.GetAxis("Vertical");
         horizontalInput = Input.GetAxis("Horizontal");
     }
-    
+
     void Brake()
     {
-    if (Input.GetKey(KeyCode.Space))
-    {
-        frontLeftWheelCollider.brakeTorque = brakeForce;
-        frontRightWheelCollider.brakeTorque = brakeForce;
-        backLeftWheelCollider.brakeTorque = brakeForce;
-        backRightWheelCollider.brakeTorque = brakeForce;
-        rigidBody.linearDamping = 2f; 
+        if (Input.GetKey(KeyCode.Space))
+        {
+            frontLeftWheelCollider.brakeTorque = brakeForce;
+            frontRightWheelCollider.brakeTorque = brakeForce;
+            backLeftWheelCollider.brakeTorque = brakeForce;
+            backRightWheelCollider.brakeTorque = brakeForce;
+            rigidBody.linearDamping = 2f;
+        }
+        else
+        {
+            frontLeftWheelCollider.brakeTorque = 0f;
+            frontRightWheelCollider.brakeTorque = 0f;
+            backLeftWheelCollider.brakeTorque = 0f;
+            backRightWheelCollider.brakeTorque = 0f;
+            rigidBody.linearDamping = 0f;
+        }
     }
-    else
-    {
-        frontLeftWheelCollider.brakeTorque = 0f;
-        frontRightWheelCollider.brakeTorque = 0f;
-        backLeftWheelCollider.brakeTorque = 0f;
-        backRightWheelCollider.brakeTorque = 0f;
-        rigidBody.linearDamping = 0f; 
-    }
-  }
 
     void Move()
     {
@@ -80,17 +82,19 @@ public class CarController : MonoBehaviour
         frontRightWheelCollider.steerAngle = steeringAngle;
     }
 
-    void AutoSteeringAdjustToCentre(){
+    void AutoSteeringAdjustToCentre()
+    {
         Quaternion targetRotation = Quaternion.Euler(0f, 0f, 0f);
         float rotationSpeed = 2f;
 
-        if (!IsSteering() && Quaternion.Angle(transform.rotation, targetRotation) > 0.1f) {
+        if (!IsSteering() && Quaternion.Angle(transform.rotation, targetRotation) > 0.1f)
+        {
             transform.rotation = Quaternion.Slerp(
-                transform.rotation, 
-                targetRotation, 
+                transform.rotation,
+                targetRotation,
                 Time.deltaTime * rotationSpeed
             );
-        } 
+        }
     }
 
     void UpdateWheels()
@@ -110,12 +114,22 @@ public class CarController : MonoBehaviour
         wheelTransform.rotation = rot;
     }
 
-    bool IsSteering(){
-        return horizontalInput != 0; 
+    bool IsSteering()
+    {
+        return horizontalInput != 0;
     }
 
-    public float GetCarSpeed(){
-       return rigidBody.linearVelocity.magnitude; 
+    public float GetCarSpeed()
+    {
+        return rigidBody.linearVelocity.magnitude;
+    }
+    
+    void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.CompareTag("TrafficVehicle"))
+        {
+            uiManager.GameOver();  
+        }
     }
 }
 
